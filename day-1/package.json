@@ -11,6 +11,9 @@
   "description": "testing network latency",
   "type": "module",
   "dependencies": {
+    "@deepgram/sdk": "^4.11.2",
+    "audio-decode": "^2.2.3",
+    "audio-play": "^2.3.1",
     "csv-writer": "^1.6.0",
     "dotenv": "^17.2.2",
     "play-sound": "^1.1.6"

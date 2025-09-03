@@ -17,7 +17,7 @@ const TEXT = "Hello world, this is a test.";
 const NUM_TRIALS = 10;
 
 // CSV output path
-const CSV_PATH = path.resolve("output/tts_timing_results.csv");
+const CSV_PATH = path.resolve("output/latency_log.csv");
 
 const csvWriter = createObjectCsvWriter({
   path: CSV_PATH,
