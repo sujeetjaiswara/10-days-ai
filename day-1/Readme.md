@@ -8,3 +8,7 @@ https://www.npmjs.com/package/dotenv
 
 > node latency_harness.js
 ```
+
+TTFB (Time To First Byte): time when the first audio chunk arrives from Deepgram.
+
+TTFS (Time To First Syllable): time when the first audible sound comes out of the speakers.
