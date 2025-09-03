@@ -1,0 +1,17 @@
+{
+  "name": "days-1",
+  "version": "1.0.0",
+  "main": "latency_harness.js",
+  "scripts": {
+    "start": "node latency_harness.js"
+  },
+  "keywords": [],
+  "author": "sujeetjaiswara",
+  "license": "MIT",
+  "description": "testing network latency",
+  "type": "module",
+  "dependencies": {
+    "csv-writer": "^1.6.0",
+    "play-sound": "^1.1.6"
+  }
+}
