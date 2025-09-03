@@ -12,6 +12,7 @@
   "type": "module",
   "dependencies": {
     "csv-writer": "^1.6.0",
+    "dotenv": "^17.2.2",
     "play-sound": "^1.1.6"
   }
 }

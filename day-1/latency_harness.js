@@ -2,16 +2,21 @@ import fs from "fs";
 import path from "path";
 import { createObjectCsvWriter } from "csv-writer";
 import { fileURLToPath } from "url";
+import "dotenv/config";
 // import play from "play-sound";
 
+// Configuration
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-const API_KEY = "sk_aefbb003597f430eaba07f678dc1ff86c37048bd512ac3d1"; // Replace with your ElevenLabs API key
-const VOICE_ID = "JBFqnCBsd6RMkjVDRZzb";
+const API_KEY = process.env.ELEVENLABS_API_KEY;
+const VOICE_ID = process.env.ELEVENLABS_VOICE_ID;
 const TTS_URL = `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}/stream`;
 
+// User inputs
 const TEXT = "Hello world, this is a test.";
+
 const NUM_TRIALS = 10;
+
+// CSV output path
 const CSV_PATH = path.resolve("output/tts_timing_results.csv");
 
 const csvWriter = createObjectCsvWriter({
