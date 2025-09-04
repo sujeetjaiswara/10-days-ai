@@ -3,7 +3,7 @@ import path from "path";
 import { createObjectCsvWriter } from "csv-writer";
 import { fileURLToPath } from "url";
 import "dotenv/config";
-// import play from "play-sound";
+import play from "play-sound";
 
 // Configuration
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -68,13 +68,13 @@ async function runTrial(trial) {
   fileStream.end();
 
   // Measure TTFS when system player starts
-  // const player = play();
+  const player = play();
   const tPlayPromise = new Promise((resolve, reject) => {
     const playStart = process.hrtime.bigint();
-    // const child = player.play(tmpFile, (err) => {
-    //   if (err) reject(err);
-    //   else resolve();
-    // });
+    const child = player.play(tmpFile, (err) => {
+      if (err) reject(err);
+      else resolve();
+    });
 
     // Approximate TTFS as when child process is spawned
     const ttfs = Number(playStart - start) / 1e9;
