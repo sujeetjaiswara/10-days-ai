@@ -9,10 +9,15 @@ import play from "play-sound";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const API_KEY = process.env.ELEVENLABS_API_KEY;
 const VOICE_ID = process.env.ELEVENLABS_VOICE_ID;
+
 const TTS_URL = `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}/stream`;
 
+console.log(`🟡 ELEVENLABS_API_KEY: ${API_KEY}`);
+console.log(`🟡 ELEVENLABS_VOICE_ID: ${VOICE_ID}`);
+console.log(`🟡 Using TTS URL: ${TTS_URL}`);
+
 // User inputs
-const TEXT = "Hello world, this is a test.";
+const TEXT = "Hi, this is Agni calling about your property expiry.";
 
 const NUM_TRIALS = 10;
 
@@ -39,10 +44,20 @@ async function runTrial(trial) {
       accept: "audio/mpeg",
       "content-type": "application/json",
     },
-    body: JSON.stringify({ text: TEXT, voice_settings: {} }),
+    body: JSON.stringify({
+      text: TEXT,
+      model_id: "eleven_multilingual_v2",
+      voice_settings: {
+        stability: 0.5,
+        similarity_boost: 0.5,
+      },
+    }),
   });
 
-  if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`HTTP error! status: ${res.status}, body: ${errorText}`);
+  }
 
   // Save streamed MP3 to temp file
   const tmpFile = path.join(__dirname, `output/trial_${trial}.mp3`);
