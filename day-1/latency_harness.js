@@ -54,9 +54,17 @@ async function runTrial(trial) {
     }),
   });
 
+  // const body = await res.json();
+  // console.log(body);
+
   if (!res.ok) {
-    const errorText = await res.text();
-    throw new Error(`HTTP error! status: ${res.status}, body: ${errorText}`);
+    const errorText = await res.json();
+    // console.log(errorText);
+    throw new Error(
+      `🐞 ElevenLabs API error: ${res.status}, ${JSON.stringify(errorText)}`
+    );
+    // throw new Error(`🐞 ${res.status}`);
+    // throw new Error(`🐞 ${res.status}, body: ${JSON.stringify(errorText)}`);
   }
 
   // Save streamed MP3 to temp file
