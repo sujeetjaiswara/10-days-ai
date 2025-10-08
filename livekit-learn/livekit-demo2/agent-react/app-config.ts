@@ -1,7 +1,7 @@
 import type { AppConfig } from './lib/types';
 
 export const APP_CONFIG_DEFAULTS: AppConfig = {
-  companyName: 'LiveKit',
+  companyName: 'Taritas',
   pageTitle: 'LiveKit Voice Agent',
   pageDescription: 'A voice agent built with LiveKit',
 
@@ -11,9 +11,9 @@ export const APP_CONFIG_DEFAULTS: AppConfig = {
   isPreConnectBufferEnabled: true,
 
   logo: '/lk-logo.svg',
-  accent: '#002cf2',
+  accent: 'white',
   logoDark: '/lk-logo-dark.svg',
-  accentDark: '#1fd5f9',
+  accentDark: '#FA812F',
   startButtonText: 'Start call',
 
   agentName: undefined,
