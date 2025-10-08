@@ -16,7 +16,7 @@ app.post("/token", async (req, res) => {
     if (!roomName || !participantName) {
         res
             .status(400)
-            .json({ errorMessage: "roomName and participantName are required" });
+            .json({ message: "Please provide both room name and participant name." });
         return;
     }
     const at = new AccessToken(LIVEKIT_API_KEY, LIVEKIT_API_SECRET, {
