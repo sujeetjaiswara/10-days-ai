@@ -1,5 +1,5 @@
-import "dotenv/config";
 import cors from "cors";
+import "dotenv/config";
 import express from "express";
 import { AccessToken, WebhookReceiver } from "livekit-server-sdk";
 const SERVER_PORT = process.env.SERVER_PORT || 6080;
@@ -9,6 +9,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.raw({ type: "application/webhook+json" }));
+// This token encodes the identity of a participant, name of the room, capabilities and permissions.
 app.post("/token", async (req, res) => {
     const roomName = req.body.roomName;
     const participantName = req.body.participantName;
@@ -37,6 +38,6 @@ app.post("/livekit/webhook", async (req, res) => {
     res.status(200).send();
 });
 app.listen(SERVER_PORT, () => {
-    console.log(`Example app listening on port ${SERVER_PORT}`);
+    console.log(`Server running at http://localhost:${SERVER_PORT}`);
 });
 //# sourceMappingURL=index.js.map
