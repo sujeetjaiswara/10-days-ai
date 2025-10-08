@@ -5,11 +5,15 @@ import {
 } from "@livekit/components-react";
 import "@livekit/components-styles";
 import { Room } from "livekit-client";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import MyVideoConference from "./components/MyVideoConference";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card } from "@/components/ui/card";
 
-const serverUrl = import.meta.env.VITE_LIVEKIT_URL;
-const token = ""; // import.meta.env.VITE_LIVEKIT_TOKEN;
+const LIVEKIT_URL = import.meta.env.VITE_LIVEKIT_URL;
+const API_URL = import.meta.env.VITE_API_URL;
 
 function App() {
   const [room] = useState(
@@ -23,29 +27,56 @@ function App() {
       })
   );
 
-  // Connect to room
+  const [token, setToken] = useState<string | "">("");
+
+  // Get the token from the backend and connect to the room
+  async function onConnect() {
+    fetch(`${API_URL}/token`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        roomName: (document.getElementById("roomName") as HTMLInputElement)
+          .value,
+        participantName: (
+          document.getElementById("participantName") as HTMLInputElement
+        ).value,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.errorMessage) {
+          throw new Error(data.errorMessage);
+        }
+
+        setToken(data.token);
+      })
+      .catch((err) => {
+        console.error(err.message);
+      });
+  }
+
+  // Connect to the room when the token is set
   useEffect(() => {
-    let mounted = true;
-
-    const connect = async () => {
-      if (mounted) {
-        await room.connect(serverUrl, token);
-      }
-    };
-    connect();
-
+    if (token) {
+      room.connect(LIVEKIT_URL, token);
+    }
     return () => {
-      mounted = false;
       room.disconnect();
     };
   }, [room]);
 
   return (
     <>
-      <div className="flex flex-col items-center justify-center h-screen w-full gap-4">
+      <div className="flex flex-col items-center justify-center h-screen w-full max-w-7xl mx-auto gap-4">
         {token ? (
           <RoomContext.Provider value={room}>
-            <div data-lk-theme="default" style={{ height: "100vh" }}>
+            <div
+              data-lk-theme="default"
+              style={{ height: "100vh" }}
+              className="w-full"
+            >
               {/* Your custom component with basic video conferencing functionality. */}
               <MyVideoConference />
 
@@ -66,46 +97,22 @@ function App() {
                 Click the button below to join a room.
               </p>
             </div>
-            <form className="grid grid-cols-1 gap-4">
-              <div className="space-y-1">
-                <label htmlFor="roomName" className="block font-semibold">
-                  Room Name
-                </label>
-                <input
-                  id="roomName"
-                  type="text"
-                  className="border border-gray-300 rounded-md"
-                />
-              </div>
-              <div className="space-y-1">
-                <label
-                  htmlFor="participantName"
-                  className="block font-semibold"
-                >
-                  Participant Name
-                </label>
-                <input
-                  id="participantName"
-                  type="text"
-                  className="border border-gray-300 rounded-md"
-                />
-              </div>
-            </form>
-            <button
-              className="bg-purple-900 hover:bg-purple-800 shadow-md text-white px-4 py-2 rounded-md"
-              onClick={async () => {
-                const pasted = window.prompt("Paste your LiveKit token");
-                if (!pasted) return;
-                try {
-                  await room.connect(serverUrl, pasted);
-                } catch (err: any) {
-                  console.error("Failed to connect to LiveKit room:", err);
-                  alert(`Connection failed: ${err?.message ?? err}`);
-                }
-              }}
-            >
-              Connect Room
-            </button>
+
+            <Card className="w-full max-w-2xl p-6">
+              <form className="grid grid-cols-1 gap-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="roomName">Room Name</Label>
+                  <Input id="roomName" type="text" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="participantName">Participant Name</Label>
+                  <Input id="participantName" type="text" />
+                </div>
+              </form>
+              <Button variant={"destructive"} onClick={onConnect}>
+                Connect
+              </Button>
+            </Card>
           </div>
         )}
       </div>
