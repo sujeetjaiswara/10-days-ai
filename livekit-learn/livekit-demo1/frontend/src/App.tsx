@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import MyVideoConference from "./components/MyVideoConference";
 
 const serverUrl = import.meta.env.VITE_LIVEKIT_URL;
-const token = ""; //import.meta.env.VITE_LIVEKIT_TOKEN;
+const token = ""; // import.meta.env.VITE_LIVEKIT_TOKEN;
 
 function App() {
   const [room] = useState(
@@ -66,6 +66,31 @@ function App() {
                 Click the button below to join a room.
               </p>
             </div>
+            <form className="grid grid-cols-1 gap-4">
+              <div className="space-y-1">
+                <label htmlFor="roomName" className="block font-semibold">
+                  Room Name
+                </label>
+                <input
+                  id="roomName"
+                  type="text"
+                  className="border border-gray-300 rounded-md"
+                />
+              </div>
+              <div className="space-y-1">
+                <label
+                  htmlFor="participantName"
+                  className="block font-semibold"
+                >
+                  Participant Name
+                </label>
+                <input
+                  id="participantName"
+                  type="text"
+                  className="border border-gray-300 rounded-md"
+                />
+              </div>
+            </form>
             <button
               className="bg-purple-900 hover:bg-purple-800 shadow-md text-white px-4 py-2 rounded-md"
               onClick={async () => {
