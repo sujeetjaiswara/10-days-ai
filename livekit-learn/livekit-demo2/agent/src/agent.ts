@@ -18,10 +18,7 @@ dotenv.config({ path: '.env.local' });
 class Assistant extends voice.Agent {
   constructor() {
     super({
-      instructions: `You are a helpful voice AI assistant. The user is interacting with you via voice, even if you perceive the conversation as text.
-      You eagerly assist users with their questions by providing information from your extensive knowledge.
-      Your responses are concise, to the point, and without any complex formatting or punctuation including emojis, asterisks, or other symbols.
-      You are curious, friendly, and have a sense of humor.`,
+      instructions: `You are a helpful assistant communicating via voice`,
     });
   }
 }
@@ -33,17 +30,32 @@ export default defineAgent({
   entry: async (ctx: JobContext) => {
     const session = new voice.AgentSession({
       stt: 'deepgram/nova-3',
-      llm: 'openai/gpt-4.1-mini',
+      llm: 'openai/gpt-4o-mini',
       tts: 'cartesia/sonic-2:9626c31c-bec5-4cca-baa8-f8ba9e84c8bc',
       turnDetection: new livekit.turnDetector.MultilingualModel(),
       vad: ctx.proc.userData.vad! as silero.VAD,
     });
 
     // Metrics collection, to measure pipeline performance
-    // For more information, see https://docs.livekit.io/agents/build/metrics/
     const usageCollector = new metrics.UsageCollector();
+
     session.on(voice.AgentSessionEventTypes.MetricsCollected, (ev) => {
-      metrics.logMetrics(ev.metrics);
+      llm_metrics_wrapper(ev.metrics);
+      usageCollector.collect(ev.metrics);
+    });
+
+    session.on(voice.AgentSessionEventTypes.MetricsCollected, (ev) => {
+      stt_metrics_wrapper(ev.metrics);
+      usageCollector.collect(ev.metrics);
+    });
+
+    session.on(voice.AgentSessionEventTypes.MetricsCollected, (ev) => {
+      eou_metrics_wrapper(ev.metrics);
+      usageCollector.collect(ev.metrics);
+    });
+
+    session.on(voice.AgentSessionEventTypes.MetricsCollected, (ev) => {
+      tts_metrics_wrapper(ev.metrics);
       usageCollector.collect(ev.metrics);
     });
 
@@ -73,3 +85,52 @@ export default defineAgent({
 });
 
 cli.runApp(new WorkerOptions({ agent: fileURLToPath(import.meta.url) }));
+
+async function llm_metrics_wrapper(metrics: any) {
+  await on_llm_metrics_collected(metrics);
+}
+
+async function stt_metrics_wrapper(metrics: any) {
+  await on_stt_metrics_collected(metrics);
+}
+
+async function eou_metrics_wrapper(metrics: any) {
+  await on_eou_metrics_collected(metrics);
+}
+
+async function tts_metrics_wrapper(metrics: any) {
+  await on_tts_metrics_collected(metrics);
+}
+
+async function on_llm_metrics_collected(metrics: metrics.LLMMetrics): Promise<void> {
+  console.log('\n--- LLM Metrics ---');
+  console.log(`Prompt Tokens: ${metrics.promptTokens}`);
+  console.log(`Completion Tokens: ${metrics.completionTokens}`);
+  console.log(`Tokens per second: ${metrics.tokensPerSecond?.toFixed(4)}`);
+  console.log(`TTFT: ${metrics.ttft?.toFixed(4)}s`);
+  console.log('------------------\n');
+}
+
+async function on_stt_metrics_collected(metrics: metrics.STTMetrics): Promise<void> {
+  console.log('\n--- STT Metrics ---');
+  console.log(`Duration: ${metrics.duration?.toFixed(4)}s`);
+  console.log(`Audio Duration: ${metrics.audioDuration?.toFixed(4)}s`);
+  console.log(`Streamed: ${metrics.streamed ? 'Yes' : 'No'}`);
+  console.log('------------------\n');
+}
+
+async function on_eou_metrics_collected(metrics: any): Promise<void> {
+  console.log('\n--- End of Utterance Metrics ---');
+  console.log(`End of Utterance Delay: ${metrics?.end_of_utterance_delay?.toFixed(4)}s`);
+  console.log(`Transcription Delay: ${metrics?.transcription_delay?.toFixed(4)}s`);
+  console.log('------------------\n');
+}
+
+async function on_tts_metrics_collected(metrics: metrics.TTSMetrics): Promise<void> {
+  console.log('\n--- TTS Metrics ---');
+  console.log(`TTFB: ${metrics.ttfb?.toFixed(4)}s`);
+  console.log(`Duration: ${metrics.duration?.toFixed(4)}s`);
+  console.log(`Audio Duration: ${metrics.audioDuration?.toFixed(4)}s`);
+  console.log(`Streamed: ${metrics.streamed ? 'Yes' : 'No'}`);
+  console.log('------------------\n');
+}
